@@ -19,7 +19,11 @@ BadgeQuest is a gamified reflection system designed for Learning Management Syst
 ### Installation
 
 ```bash
+# Install from PyPI
 pip install badgequest
+
+# Or with uv (recommended)
+uv pip install badgequest
 ```
 
 ### Running the Server
