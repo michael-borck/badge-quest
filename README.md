@@ -8,6 +8,7 @@ BadgeQuest is a gamified reflection system designed for Learning Management Syst
 
 - **Weekly Reflection Tracking**: Students submit reflections that are validated for quality
 - **Smart Validation**: Checks word count, readability, sentiment, and uniqueness
+- **Similarity Detection**: Prevents resubmission of previous reflections with minor changes (80% threshold)
 - **Badge Progression**: Earn badges from "Dabbler" to "Mastery" based on consistent participation
 - **LMS Integration**: Ready-to-use HTML forms for Blackboard (Canvas and Moodle coming soon)
 - **Instructor Tools**: Generate progress reports for easy grade center uploads

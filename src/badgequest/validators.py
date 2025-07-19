@@ -1,6 +1,5 @@
 """Validation logic for reflections."""
 
-
 import textstat
 from textblob import TextBlob
 

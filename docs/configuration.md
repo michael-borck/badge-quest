@@ -101,6 +101,7 @@ Create a `courses.json` file to define multiple courses:
 | `min_readability` | float | Minimum Flesch Reading Ease score | 50 |
 | `min_sentiment` | float | Minimum sentiment polarity (-1 to 1) | 0 |
 | `max_weeks` | integer | Maximum weeks in the course | 12 |
+| `similarity_threshold` | float | Maximum allowed similarity (0-1) | 0.8 |
 | `badges` | array | Badge level definitions | See default |
 
 ### Badge Definition
@@ -161,6 +162,29 @@ Update the hidden course field in your HTML form:
 ```
 
 ## Validation Rules
+
+### Similarity Checking
+
+BadgeQuest now includes intelligent similarity detection to prevent students from reusing previous reflections with minor changes:
+
+- **Exact Duplicate Check**: First checks for identical submissions (copy-paste)
+- **Similarity Analysis**: Uses Levenshtein distance to calculate text similarity
+- **Configurable Threshold**: Default is 80% (0.8) - reflections must be at least 20% different
+- **Per-Student Comparison**: Only compares against the student's own previous submissions
+
+#### How Similarity Works:
+- 100% (1.0) = Identical text
+- 80% (0.8) = Default threshold - minor changes like fixing typos
+- 60% (0.6) = Significant overlap but some new content
+- 40% (0.4) = Some similar structure but mostly new content
+- 0% (0.0) = Completely different
+
+#### Template Use:
+The 80% threshold allows students to:
+- Use a consistent reflection structure
+- Keep helpful formatting patterns
+- Reuse opening/closing phrases
+- But requires ~20% new content each week
 
 ### Readability Score
 

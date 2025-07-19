@@ -1,6 +1,6 @@
 [project]
 name = "badge-quest"
-version = "0.1.1"
+version = "0.2.0"
 description = "Collect, learn, repeat. A reflection badge system for Learning Management Systems."
 authors = [
     {name = "Michael", email = "michael@example.com"},
@@ -29,6 +29,7 @@ dependencies = [
     "click>=8.1.0",
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
+    "python-Levenshtein>=0.20.0",
 ]
 
 [project.optional-dependencies]

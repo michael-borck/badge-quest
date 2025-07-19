@@ -1,12 +1,12 @@
 """Flask application for BadgeQuest."""
 
-
 from flask import Flask, jsonify, render_template_string, request
 from flask_cors import CORS
 
 from .badges import BadgeSystem
 from .config import Config
 from .models import Database, ReflectionProcessor
+from .similarity import SimilarityChecker
 from .validators import ReflectionValidator
 
 
@@ -53,21 +53,58 @@ def create_app(config_class=Config) -> Flask:
                 }
             )
 
-        # Check for duplicates
+        # Check for exact duplicates first
         fingerprint = processor.get_fingerprint(text)
         if db.check_duplicate(fingerprint):
             return jsonify(
                 {
                     "valid": False,
-                    "reason": "Duplicate text submission detected",
+                    "reason": "Exact duplicate submission detected",
                     "word_count": metrics["word_count"],
                     "readability": metrics["readability"],
                     "sentiment": metrics["sentiment"],
                 }
             )
 
+        # Check for similarity with previous submissions
+        similarity_checker = SimilarityChecker(course_config.similarity_threshold)
+        previous_reflections = db.get_student_reflections_encrypted(student_id, course_id)
+
+        if previous_reflections:
+            # Decode previous reflections for comparison
+            previous_texts = []
+            for week_id_prev, encrypted_text in previous_reflections:
+                if encrypted_text:  # Skip if no text stored
+                    try:
+                        decoded_text = similarity_checker.decode_text(encrypted_text)
+                        previous_texts.append((week_id_prev, decoded_text))
+                    except Exception:
+                        # Skip if decoding fails
+                        pass
+
+            # Check similarity
+            if previous_texts:
+                for week_id_prev, prev_text in previous_texts:
+                    similarity = similarity_checker.calculate_similarity(text, prev_text)
+                    if similarity > course_config.similarity_threshold:
+                        return jsonify(
+                            {
+                                "valid": False,
+                                "reason": f"Too similar to your {week_id_prev} submission ({similarity:.0%} similarity)",
+                                "word_count": metrics["word_count"],
+                                "readability": metrics["readability"],
+                                "sentiment": metrics["sentiment"],
+                                "similarity_score": similarity,
+                                "threshold": course_config.similarity_threshold,
+                            }
+                        )
+
         # Generate code and store reflection
         code = processor.generate_code(text, week_id, student_id)
+
+        # Encode text for storage
+        text_encrypted = similarity_checker.encode_text(text)
+
         db.add_reflection(
             student_id=student_id,
             course_id=course_id,
@@ -77,6 +114,7 @@ def create_app(config_class=Config) -> Flask:
             word_count=int(metrics["word_count"]),
             readability=metrics["readability"],
             sentiment=metrics["sentiment"],
+            text_encrypted=text_encrypted,
         )
 
         # Get progress information

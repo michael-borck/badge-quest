@@ -1,6 +1,5 @@
 """Tests for reflection validators."""
 
-
 from badgequest.config import CourseConfig
 from badgequest.validators import ReflectionValidator
 

@@ -34,6 +34,7 @@ class CourseConfig:
         self.min_readability = config.get("min_readability", 50)
         self.min_sentiment = config.get("min_sentiment", 0)
         self.max_weeks = config.get("max_weeks", 12)
+        self.similarity_threshold = config.get("similarity_threshold", 0.8)
 
         # Parse badge levels
         self.badge_levels = []
@@ -73,7 +74,7 @@ class Config:
 
     # Application configuration
     APP_NAME = "BadgeQuest"
-    APP_VERSION = "0.1.1"
+    APP_VERSION = "0.2.0"
 
     # Database configuration
     @property

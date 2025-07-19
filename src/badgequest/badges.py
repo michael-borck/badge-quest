@@ -1,6 +1,5 @@
 """Badge system logic."""
 
-
 from .config import CourseConfig
 
 

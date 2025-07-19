@@ -1,6 +1,5 @@
 """Tests for BadgeQuest badge system."""
 
-
 from badgequest.badges import BadgeSystem
 from badgequest.config import CourseConfig
 

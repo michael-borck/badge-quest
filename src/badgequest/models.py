@@ -41,7 +41,8 @@ class Database:
                 timestamp TEXT NOT NULL,
                 word_count INTEGER,
                 readability REAL,
-                sentiment REAL
+                sentiment REAL,
+                text_encrypted TEXT
             )
             """)
 
@@ -71,6 +72,7 @@ class Database:
         word_count: int,
         readability: float,
         sentiment: float,
+        text_encrypted: str | None = None,
     ) -> None:
         """Add a new reflection to the database."""
         with self.get_connection() as conn:
@@ -79,8 +81,8 @@ class Database:
                 """
                 INSERT INTO reflections (
                     student_id, course_id, fingerprint, week_id,
-                    code, timestamp, word_count, readability, sentiment
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    code, timestamp, word_count, readability, sentiment, text_encrypted
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (
                     student_id,
@@ -92,6 +94,7 @@ class Database:
                     word_count,
                     readability,
                     sentiment,
+                    text_encrypted,
                 ),
             )
             conn.commit()
@@ -158,6 +161,27 @@ class Database:
                     progress[student_id].append(row[1])
 
             return progress
+
+    def get_student_reflections_encrypted(
+        self, student_id: str, course_id: str
+    ) -> list[tuple[str, str]]:
+        """Get encrypted reflections for a student in a course.
+
+        Returns:
+            List of tuples (week_id, encrypted_text)
+        """
+        with self.get_connection() as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                SELECT week_id, text_encrypted
+                FROM reflections
+                WHERE student_id = ? AND course_id = ? AND text_encrypted IS NOT NULL
+                ORDER BY timestamp DESC
+            """,
+                (student_id, course_id),
+            )
+            return [(row[0], row[1]) for row in c.fetchall()]
 
 
 class ReflectionProcessor:
