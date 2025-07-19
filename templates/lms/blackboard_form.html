@@ -1,0 +1,72 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+  <h3>📝 Submit Your Weekly Reflection</h3>
+  <p>Enter your Curtin Student ID and your reflection for this week. You'll receive a unique code and badge progress.</p>
+
+  <label for="student_id"><strong>Student ID:</strong></label><br>
+  <input id="student_id" type="text" style="width: 100%; margin-bottom: 10px;" /><br>
+
+  <label for="week_id"><strong>Week:</strong></label><br>
+  <input id="week_id" type="text" value="Week03" style="width: 100%; margin-bottom: 10px;" /><br>
+
+  <input id="course_id" type="hidden" value="default" />
+
+  <label for="reflection"><strong>Your Reflection:</strong></label><br>
+  <textarea id="reflection" rows="8" style="width: 100%;"></textarea><br>
+
+  <button onclick="submitReflection()" style="margin-top: 10px;">🚀 Submit Reflection</button>
+
+  <div id="result" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;"></div>
+</div>
+
+<script>
+  function submitReflection() {
+    const student_id = document.getElementById('student_id').value.trim();
+    const week_id = document.getElementById('week_id').value.trim();
+    const text = document.getElementById('reflection').value.trim();
+    const course_id = document.getElementById('course_id').value.trim();
+    const resultDiv = document.getElementById('result');
+
+    if (!student_id || !week_id || !text) {
+      resultDiv.innerHTML = "<p style='color: red;'>Please fill in all fields.</p>";
+      return;
+    }
+
+    // Update this URL to point to your BadgeQuest server
+  fetch("https://YOUR_SERVER_URL/stamp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id, week_id, text, course_id })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (!data.valid) {
+        resultDiv.innerHTML = `
+          <p style='color: red;'>❌ Submission failed: ${data.reason || 'Unknown error'}</p>
+          <ul>
+            <li><strong>Word count:</strong> ${data.word_count}</li>
+            <li><strong>Readability:</strong> ${data.readability}</li>
+            <li><strong>Sentiment:</strong> ${data.sentiment}</li>
+          </ul>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <p style='color: green;'>✅ Submission accepted!</p>
+          <ul>
+            <li><strong>Word count:</strong> ${data.word_count}</li>
+            <li><strong>Readability:</strong> ${data.readability}</li>
+            <li><strong>Sentiment:</strong> ${data.sentiment}</li>
+            <li><strong>Reflection Code:</strong> <code>${data.code}</code></li>
+            <li><strong>Weeks Completed:</strong> ${data.weeks_completed}</li>
+            <li><strong>Current Badge:</strong> ${data.current_badge}</li>
+          </ul>
+          <p style='font-size: 0.9em; color: #555;'>📌 Your badge will be uploaded to Grade Centre weekly. You do not need to submit this code anywhere else.</p>
+        `;
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      resultDiv.innerHTML = "<p style='color: red;'>⚠️ Server error. Please try again later.</p>";
+    });
+  }
+</script>
+
