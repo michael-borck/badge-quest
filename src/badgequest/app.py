@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 from .badges import BadgeSystem
 from .config import Config
+from .microcredentials import MicroCredentialSystem
 from .models import Database, ReflectionProcessor
 from .similarity import SimilarityChecker
 from .validators import ReflectionValidator
@@ -30,6 +31,7 @@ def create_app(config_class=Config) -> Flask:
         week_id = data.get("week_id", "").strip()
         student_id = data.get("student_id", "").strip()
         course_id = data.get("course_id", "default").strip()
+        theme_id = data.get("theme_id", "").strip() or None
 
         if not text or not week_id or not student_id:
             return jsonify({"error": "Missing text, week_id, or student_id"}), 400
@@ -115,26 +117,38 @@ def create_app(config_class=Config) -> Flask:
             readability=metrics["readability"],
             sentiment=metrics["sentiment"],
             text_encrypted=text_encrypted,
+            theme_id=theme_id,
         )
 
         # Get progress information
         weeks = db.get_student_weeks(student_id, course_id)
         progress = badge_system.get_progress_summary(len(weeks))
 
-        return jsonify(
-            {
-                "valid": True,
-                "code": code,
-                "word_count": metrics["word_count"],
-                "readability": metrics["readability"],
-                "sentiment": metrics["sentiment"],
-                "weeks_completed": progress["weeks_completed"],
-                "current_badge": progress["current_badge"],
-                "progress_percentage": progress["progress_percentage"],
-                "next_badge_info": progress.get("next_badge"),
-                "note": "📌 This badge status will be uploaded to Grade Centre weekly.",
-            }
-        )
+        # Check for micro-credentials
+        micro_system = MicroCredentialSystem(course_config, db)
+        newly_awarded = micro_system.check_and_award_credentials(student_id, course_id, theme_id)
+        earned_credentials = micro_system.get_student_credentials_display(student_id, course_id)
+
+        response_data = {
+            "valid": True,
+            "code": code,
+            "word_count": metrics["word_count"],
+            "readability": metrics["readability"],
+            "sentiment": metrics["sentiment"],
+            "weeks_completed": progress["weeks_completed"],
+            "current_badge": progress["current_badge"],
+            "progress_percentage": progress["progress_percentage"],
+            "next_badge_info": progress.get("next_badge"),
+            "micro_credentials_earned": len(earned_credentials),
+            "note": "📌 This badge status will be uploaded to Grade Centre weekly.",
+        }
+
+        # Add newly awarded credentials if any
+        if newly_awarded:
+            response_data["newly_awarded_credentials"] = newly_awarded
+            response_data["celebration_message"] = f"🎉 Congratulations! You earned {len(newly_awarded)} new micro-credential(s)!"
+
+        return jsonify(response_data)
 
     @app.route("/verify/<code>")
     def verify(code: str):
@@ -157,14 +171,26 @@ def create_app(config_class=Config) -> Flask:
 
         course_config = config_class.get_course_config(course_id)
         badge_system = BadgeSystem(course_config)
+        micro_system = MicroCredentialSystem(course_config, db)
 
         weeks = db.get_student_weeks(student_id, course_id)
         progress_info = badge_system.get_progress_summary(len(weeks))
 
+        # Get micro-credentials progress
+        micro_credentials_progress = micro_system.get_credentials_progress(student_id, course_id)
+        earned_credentials = [c for c in micro_credentials_progress if c["status"] == "earned"]
+
         if format_type == "json":
-            return jsonify(
-                {"student_id": student_id, "course_id": course_id, "weeks": weeks, **progress_info}
-            )
+            return jsonify({
+                "student_id": student_id,
+                "course_id": course_id,
+                "weeks": weeks,
+                **progress_info,
+                "micro_credentials": {
+                    "earned": earned_credentials,
+                    "progress": micro_credentials_progress
+                }
+            })
 
         # HTML response
         html = f"""
@@ -181,6 +207,25 @@ def create_app(config_class=Config) -> Flask:
             <p><strong>Next Badge:</strong> {progress_info["next_badge"]}
             (in {progress_info["weeks_needed"]} more weeks)</p>
             """
+
+        # Add micro-credentials section
+        if micro_credentials_progress:
+            html += "<h3>🏅 Micro-Credentials</h3>"
+
+            # Show earned credentials
+            if earned_credentials:
+                html += "<h4>Earned:</h4><ul>"
+                for cred in earned_credentials:
+                    html += f"<li>{cred['emoji']} <strong>{cred['name']}</strong> - {cred['description']} (earned {cred['earned_date'][:10]})</li>"
+                html += "</ul>"
+
+            # Show in-progress credentials
+            in_progress = [c for c in micro_credentials_progress if c["status"] == "in_progress"]
+            if in_progress:
+                html += "<h4>In Progress:</h4><ul>"
+                for cred in in_progress:
+                    html += f"<li>{cred['emoji']} <strong>{cred['name']}</strong> - {cred['progress']} submissions ({cred['description']})</li>"
+                html += "</ul>"
 
         if weeks:
             html += "<h3>Completed Weeks:</h3><ul>"
@@ -202,20 +247,58 @@ def create_app(config_class=Config) -> Flask:
 
         course_config = config_class.get_course_config(course_id)
         badge_system = BadgeSystem(course_config)
+        micro_system = MicroCredentialSystem(course_config, db)
 
         results = []
         for student_id in student_ids:
             weeks = db.get_student_weeks(student_id, course_id)
             progress_info = badge_system.get_progress_summary(len(weeks))
+
+            # Get micro-credentials info
+            earned_credentials = micro_system.get_student_credentials_display(student_id, course_id)
+
             results.append(
                 {
                     "student_id": student_id,
                     "weeks_completed": len(weeks),
                     "badge": progress_info["current_badge"],
+                    "micro_credentials_earned": len(earned_credentials),
+                    "micro_credentials": [
+                        {
+                            "name": cred["name"],
+                            "emoji": cred["emoji"],
+                            "earned_date": cred["earned_date"]
+                        }
+                        for cred in earned_credentials
+                    ]
                 }
             )
 
         return jsonify({"course_id": course_id, "results": results})
+
+    @app.route("/api/micro-credentials/<student_id>")
+    def get_micro_credentials(student_id: str):
+        """Get micro-credentials for a specific student."""
+        course_id = request.args.get("course", "default")
+
+        course_config = config_class.get_course_config(course_id)
+        micro_system = MicroCredentialSystem(course_config, db)
+
+        # Get all credentials progress
+        credentials_progress = micro_system.get_credentials_progress(student_id, course_id)
+
+        # Split into earned and in-progress
+        earned = [c for c in credentials_progress if c["status"] == "earned"]
+        in_progress = [c for c in credentials_progress if c["status"] == "in_progress"]
+
+        return jsonify({
+            "student_id": student_id,
+            "course_id": course_id,
+            "total_available": len(course_config.micro_credentials),
+            "total_earned": len(earned),
+            "earned_credentials": earned,
+            "in_progress_credentials": in_progress,
+        })
 
     @app.route("/health")
     def health():

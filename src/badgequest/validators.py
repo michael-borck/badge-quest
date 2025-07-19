@@ -15,11 +15,11 @@ class ReflectionValidator:
     def analyze_text(self, text: str) -> dict[str, float]:
         """Analyze text and return metrics."""
         word_count = len(text.split())
-        readability = textstat.flesch_reading_ease(text)
+        readability = textstat.flesch_reading_ease(text)  # type: ignore
 
         try:
             blob = TextBlob(text)
-            sentiment = blob.sentiment.polarity
+            sentiment = float(blob.sentiment.polarity)  # type: ignore
         except Exception:
             # If sentiment analysis fails, default to neutral
             sentiment = 0.0

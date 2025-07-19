@@ -117,11 +117,23 @@ def generate_progress(students: str, course: str, output: str, server: str):
             # Write CSV
             with open(output, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
-                writer.writerow(["Student ID", "Completed Weeks", "Badge"])
+                writer.writerow(["Student ID", "Completed Weeks", "Badge", "Micro-Credentials Earned", "Micro-Credentials List"])
                 for result in results:
-                    writer.writerow(
-                        [result["student_id"], result["weeks_completed"], result["badge"]]
-                    )
+                    # Format micro-credentials list
+                    micro_creds_list = ""
+                    if result.get("micro_credentials"):
+                        micro_creds_list = "; ".join([
+                            f"{cred['emoji']} {cred['name']}"
+                            for cred in result["micro_credentials"]
+                        ])
+
+                    writer.writerow([
+                        result["student_id"],
+                        result["weeks_completed"],
+                        result["badge"],
+                        result.get("micro_credentials_earned", 0),
+                        micro_creds_list
+                    ])
 
             click.echo(f"✅ Progress report saved to: {output}")
             return
@@ -140,16 +152,33 @@ def generate_progress(students: str, course: str, output: str, server: str):
                 )
                 if response.status_code == 200:
                     data = response.json()
-                    rows.append((sid, data["weeks_completed"], data["current_badge"]))
+                    # Format micro-credentials list
+                    micro_creds_list = ""
+                    micro_creds_earned = 0
+                    if "micro_credentials" in data and data["micro_credentials"].get("earned"):
+                        earned = data["micro_credentials"]["earned"]
+                        micro_creds_earned = len(earned)
+                        micro_creds_list = "; ".join([
+                            f"{cred['emoji']} {cred['name']}"
+                            for cred in earned
+                        ])
+
+                    rows.append((
+                        sid,
+                        data["weeks_completed"],
+                        data["current_badge"],
+                        micro_creds_earned,
+                        micro_creds_list
+                    ))
                 else:
-                    rows.append((sid, "0", "❌ Not Found"))
+                    rows.append((sid, "0", "❌ Not Found", "0", ""))
             except Exception:
-                rows.append((sid, "0", "❌ Error"))
+                rows.append((sid, "0", "❌ Error", "0", ""))
 
     # Write CSV
     with open(output, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["Student ID", "Completed Weeks", "Badge"])
+        writer.writerow(["Student ID", "Completed Weeks", "Badge", "Micro-Credentials Earned", "Micro-Credentials List"])
         writer.writerows(rows)
 
     click.echo(f"✅ Progress report saved to: {output}")

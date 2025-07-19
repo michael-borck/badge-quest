@@ -10,10 +10,11 @@ BadgeQuest is a gamified reflection system designed for Learning Management Syst
 - **Smart Validation**: Checks word count, readability, sentiment, and uniqueness
 - **Similarity Detection**: Prevents resubmission of previous reflections with minor changes (80% threshold)
 - **Badge Progression**: Earn badges from "Dabbler" to "Mastery" based on consistent participation
+- **Micro-Credentials**: Theme-based achievements for focused reflection topics (e.g., AI Ethics Explorer, Innovation Champion)
 - **LMS Integration**: Ready-to-use HTML forms for Blackboard (Canvas and Moodle coming soon)
 - **Instructor Tools**: Generate progress reports for easy grade center uploads
 - **Privacy-First**: Only stores anonymized data with hashed reflections
-- **Configurable**: Support multiple courses with custom badge themes
+- **Configurable**: Support multiple courses with custom badge themes and micro-credentials
 
 ## Quick Start
 
@@ -74,11 +75,29 @@ The default badge progression:
 | 12 | 🗣️ | Explainer |
 | 14+ | 🏆 | Mastery |
 
+### Micro-Credentials
+
+Students can earn theme-based micro-credentials by submitting reflections with specific themes. Example configuration:
+
+```python
+"micro_credentials": {
+    "ethics_explorer": {
+        "name": "AI Ethics Explorer",
+        "emoji": "⚖️",
+        "description": "Demonstrated strong ethical analysis in AI reflections",
+        "themes": ["ethics", "responsibility"],
+        "min_submissions": 2
+    }
+}
+```
+
 ## API Endpoints
 
-- `POST /stamp` - Submit a reflection
-- `GET /progress/<student_id>` - View student progress
+- `POST /stamp` - Submit a reflection (with optional theme_id)
+- `GET /progress/<student_id>` - View student progress including micro-credentials
 - `GET /verify/<code>` - Verify a reflection code
+- `GET /api/micro-credentials/<student_id>` - Get detailed micro-credentials information
+- `POST /api/progress/bulk` - Get progress for multiple students including micro-credentials
 
 ## Development
 

@@ -57,6 +57,11 @@ class CourseConfig:
             )
             self.badge_levels.append(level)
 
+        # Parse micro-credentials
+        self.micro_credentials = {}
+        if "micro_credentials" in config:
+            self.micro_credentials = config["micro_credentials"]
+
     def get_badge_tuples(self) -> list[tuple[int, str]]:
         """Get badge levels as tuples for backward compatibility."""
         return [level.to_tuple() for level in self.badge_levels]
@@ -74,7 +79,7 @@ class Config:
 
     # Application configuration
     APP_NAME = "BadgeQuest"
-    APP_VERSION = "0.2.0"
+    APP_VERSION = "0.3.0"
 
     # Database configuration
     @property
@@ -122,6 +127,29 @@ class Config:
                 {"weeks": 12, "emoji": "🗣️", "title": "AI Explainer"},
                 {"weeks": 14, "emoji": "🏆", "title": "AI Mastery"},
             ],
+            "micro_credentials": {
+                "ethics_explorer": {
+                    "name": "AI Ethics Explorer",
+                    "emoji": "⚖️",
+                    "description": "Demonstrated strong ethical analysis in AI reflections",
+                    "themes": ["ethics", "responsibility"],
+                    "min_submissions": 2,
+                },
+                "innovation_champion": {
+                    "name": "Innovation Champion",
+                    "emoji": "💡",
+                    "description": "Showed creative thinking about AI applications",
+                    "themes": ["innovation", "creativity"],
+                    "min_submissions": 2,
+                },
+                "technical_analyst": {
+                    "name": "Technical Analyst",
+                    "emoji": "🔬",
+                    "description": "Demonstrated deep technical understanding",
+                    "themes": ["technical", "algorithms"],
+                    "min_submissions": 2,
+                },
+            },
         },
     }
 

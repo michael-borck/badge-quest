@@ -1,6 +1,6 @@
 [project]
 name = "badge-quest"
-version = "0.2.0"
+version = "0.3.0"
 description = "Collect, learn, repeat. A reflection badge system for Learning Management Systems."
 authors = [
     {name = "Michael", email = "michael@example.com"},

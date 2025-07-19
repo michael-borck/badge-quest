@@ -10,6 +10,16 @@
 
   <input id="course_id" type="hidden" value="default" />
 
+  <label for="theme_id"><strong>Theme (Optional):</strong></label><br>
+  <select id="theme_id" style="width: 100%; margin-bottom: 10px;">
+    <option value="">-- Select a theme --</option>
+    <option value="ethics">Ethics & Responsibility</option>
+    <option value="innovation">Innovation & Creativity</option>
+    <option value="technical">Technical Analysis</option>
+    <option value="collaboration">Collaboration & Teamwork</option>
+    <option value="critical_thinking">Critical Thinking</option>
+  </select><br>
+
   <label for="reflection"><strong>Your Reflection:</strong></label><br>
   <textarea id="reflection" rows="8" style="width: 100%;"></textarea><br>
 
@@ -24,6 +34,7 @@
     const week_id = document.getElementById('week_id').value.trim();
     const text = document.getElementById('reflection').value.trim();
     const course_id = document.getElementById('course_id').value.trim();
+    const theme_id = document.getElementById('theme_id').value.trim();
     const resultDiv = document.getElementById('result');
 
     if (!student_id || !week_id || !text) {
@@ -35,7 +46,7 @@
   fetch("https://YOUR_SERVER_URL/stamp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ student_id, week_id, text, course_id })
+      body: JSON.stringify({ student_id, week_id, text, course_id, theme_id })
     })
     .then(response => response.json())
     .then(data => {
@@ -49,7 +60,7 @@
           </ul>
         `;
       } else {
-        resultDiv.innerHTML = `
+        let html = `
           <p style='color: green;'>✅ Submission accepted!</p>
           <ul>
             <li><strong>Word count:</strong> ${data.word_count}</li>
@@ -58,9 +69,29 @@
             <li><strong>Reflection Code:</strong> <code>${data.code}</code></li>
             <li><strong>Weeks Completed:</strong> ${data.weeks_completed}</li>
             <li><strong>Current Badge:</strong> ${data.current_badge}</li>
-          </ul>
-          <p style='font-size: 0.9em; color: #555;'>📌 Your badge will be uploaded to Grade Centre weekly. You do not need to submit this code anywhere else.</p>
         `;
+        
+        // Add micro-credentials info if present
+        if (data.micro_credentials_earned && data.micro_credentials_earned > 0) {
+          html += `<li><strong>Micro-Credentials Earned:</strong> ${data.micro_credentials_earned}</li>`;
+        }
+        
+        html += `</ul>`;
+        
+        // Show celebration message for newly awarded credentials
+        if (data.newly_awarded_credentials && data.newly_awarded_credentials.length > 0) {
+          html += `<div style='background: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 5px;'>`;
+          html += `<p style='color: #007bff; font-weight: bold;'>${data.celebration_message}</p>`;
+          html += `<ul>`;
+          for (const cred of data.newly_awarded_credentials) {
+            html += `<li>${cred.emoji} <strong>${cred.name}</strong> - ${cred.description}</li>`;
+          }
+          html += `</ul></div>`;
+        }
+        
+        html += `<p style='font-size: 0.9em; color: #555;'>📌 Your badge will be uploaded to Grade Centre weekly. You do not need to submit this code anywhere else.</p>`;
+        
+        resultDiv.innerHTML = html;
       }
     })
     .catch(err => {

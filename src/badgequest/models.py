@@ -42,7 +42,8 @@ class Database:
                 word_count INTEGER,
                 readability REAL,
                 sentiment REAL,
-                text_encrypted TEXT
+                text_encrypted TEXT,
+                theme_id TEXT
             )
             """)
 
@@ -60,6 +61,24 @@ class Database:
             ON reflections(code)
             """)
 
+            # Create micro-credentials table
+            c.execute("""
+            CREATE TABLE IF NOT EXISTS student_micro_credentials (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id TEXT NOT NULL,
+                course_id TEXT NOT NULL,
+                credential_id TEXT NOT NULL,
+                earned_date TEXT NOT NULL,
+                weeks_completed TEXT NOT NULL,
+                UNIQUE(student_id, course_id, credential_id)
+            )
+            """)
+
+            c.execute("""
+            CREATE INDEX IF NOT EXISTS idx_student_credentials
+            ON student_micro_credentials(student_id, course_id)
+            """)
+
             conn.commit()
 
     def add_reflection(
@@ -73,6 +92,7 @@ class Database:
         readability: float,
         sentiment: float,
         text_encrypted: str | None = None,
+        theme_id: str | None = None,
     ) -> None:
         """Add a new reflection to the database."""
         with self.get_connection() as conn:
@@ -81,8 +101,8 @@ class Database:
                 """
                 INSERT INTO reflections (
                     student_id, course_id, fingerprint, week_id,
-                    code, timestamp, word_count, readability, sentiment, text_encrypted
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    code, timestamp, word_count, readability, sentiment, text_encrypted, theme_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (
                     student_id,
@@ -95,6 +115,7 @@ class Database:
                     readability,
                     sentiment,
                     text_encrypted,
+                    theme_id,
                 ),
             )
             conn.commit()
@@ -182,6 +203,74 @@ class Database:
                 (student_id, course_id),
             )
             return [(row[0], row[1]) for row in c.fetchall()]
+
+    def add_micro_credential(
+        self, student_id: str, course_id: str, credential_id: str, weeks_completed: list[str]
+    ) -> bool:
+        """Award a micro-credential to a student.
+
+        Returns:
+            True if newly awarded, False if already exists
+        """
+        with self.get_connection() as conn:
+            c = conn.cursor()
+            try:
+                c.execute(
+                    """
+                    INSERT INTO student_micro_credentials
+                    (student_id, course_id, credential_id, earned_date, weeks_completed)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (
+                        student_id,
+                        course_id,
+                        credential_id,
+                        datetime.utcnow().isoformat(),
+                        ",".join(weeks_completed),
+                    ),
+                )
+                conn.commit()
+                return True
+            except sqlite3.IntegrityError:
+                # Already has this credential
+                return False
+
+    def get_student_micro_credentials(self, student_id: str, course_id: str) -> list[dict]:
+        """Get all micro-credentials earned by a student in a course."""
+        with self.get_connection() as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                SELECT credential_id, earned_date, weeks_completed
+                FROM student_micro_credentials
+                WHERE student_id = ? AND course_id = ?
+                ORDER BY earned_date
+                """,
+                (student_id, course_id),
+            )
+            return [
+                {
+                    "credential_id": row[0],
+                    "earned_date": row[1],
+                    "weeks_completed": row[2].split(",") if row[2] else [],
+                }
+                for row in c.fetchall()
+            ]
+
+    def get_student_theme_weeks(self, student_id: str, course_id: str, theme_id: str) -> list[str]:
+        """Get weeks where student completed reflections for a specific theme."""
+        with self.get_connection() as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                SELECT DISTINCT week_id
+                FROM reflections
+                WHERE student_id = ? AND course_id = ? AND theme_id = ?
+                ORDER BY week_id
+                """,
+                (student_id, course_id, theme_id),
+            )
+            return [row[0] for row in c.fetchall()]
 
 
 class ReflectionProcessor:
