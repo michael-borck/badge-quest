@@ -45,15 +45,17 @@ def create_app(config_class=Config) -> Flask:
         is_valid, error_message, metrics = validator.validate(text)
 
         if not is_valid:
-            return jsonify(
-                {
-                    "valid": False,
-                    "reason": error_message,
-                    "word_count": metrics["word_count"],
-                    "readability": metrics["readability"],
-                    "sentiment": metrics["sentiment"],
-                }
-            )
+            response_data = {
+                "valid": False,
+                "reason": error_message,
+                "word_count": metrics["word_count"],
+                "readability": metrics["readability"],
+                "sentiment": metrics["sentiment"],
+            }
+            # Include repetition score if it was calculated
+            if "repetition_score" in metrics:
+                response_data["repetition_score"] = metrics["repetition_score"]
+            return jsonify(response_data)
 
         # Check for exact duplicates first
         fingerprint = processor.get_fingerprint(text)

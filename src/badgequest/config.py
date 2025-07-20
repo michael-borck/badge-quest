@@ -98,7 +98,7 @@ class Config:
 
     # Application configuration
     APP_NAME = "BadgeQuest"
-    APP_VERSION = "0.3.1"
+    APP_VERSION = "0.3.2"
 
     # Database configuration
     @property

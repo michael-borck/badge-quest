@@ -8,7 +8,7 @@ const BadgeQuest = {
   config: {
     minWords: 100,
     maxWords: 1000,
-    serverUrl: 'https://YOUR_SERVER_URL',
+    serverUrl: 'https://badgequest.serveur.au',
     storagePrefix: 'badgequest_'
   },
 

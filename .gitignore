@@ -139,3 +139,6 @@ temp/
 # UV
 .venv/
 uv.lock
+
+# Notes and course-specific files
+notes/
