@@ -3,7 +3,7 @@
 A gamified reflection system for Learning Management Systems.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.1"
 __author__ = "BadgeQuest Contributors"
 
 from .app import create_app

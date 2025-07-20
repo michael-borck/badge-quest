@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Reflection - Introduction to AI</title>
+</head>
+<body>
+
+<div id="submission-form" style="font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px;">
+    <!-- Week Header -->
+    <div style="background: #f8f9fa; border-left: 4px solid #007bff; padding: 15px; margin-bottom: 20px;">
+        <h2 style="margin: 0; color: #007bff;">📚 Week 1: Introduction to AI</h2>
+        <p style="margin: 5px 0 0 0; color: #666;">Theme: General Reflection</p>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div style="background: #e9ecef; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+        <strong>Your Progress:</strong> Week 1 of 12 | First step on your AI journey! 🚀
+    </div>
+
+    <!-- Reflection Prompts -->
+    <div style="background: #f0f8ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #004085;">💭 Reflection Prompts (choose one or more):</h4>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>What are your current perceptions of AI?</li>
+            <li>What aspects of AI are you most curious about?</li>
+            <li>How do you think AI might impact your future career?</li>
+        </ul>
+    </div>
+
+    <!-- Student ID Input -->
+    <div style="margin-bottom: 15px;">
+        <label for="student_id" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Student ID: <span style="color: red;">*</span>
+        </label>
+        <input 
+            id="student_id" 
+            type="text" 
+            placeholder="Enter your Curtin Student ID"
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px;"
+            required
+        />
+    </div>
+
+    <!-- Hidden Fields -->
+    <input id="course_id" type="hidden" value="AI101" />
+    <input id="week_id" type="hidden" value="Week01" />
+    <input id="theme_id" type="hidden" value="" />
+
+    <!-- Reflection Textarea -->
+    <div style="margin-bottom: 15px;">
+        <label for="reflection" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Your Reflection: <span style="color: red;">*</span>
+        </label>
+        <textarea 
+            id="reflection" 
+            rows="10" 
+            placeholder="Share your thoughts about AI and what you hope to learn in this course..."
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px; resize: vertical;"
+            required
+        ></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="text-align: center; margin: 20px 0;">
+        <button 
+            onclick="BadgeQuest.submitReflection()" 
+            style="background: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold;"
+            onmouseover="this.style.background='#0056b3'" 
+            onmouseout="this.style.background='#007bff'"
+        >
+            🚀 Submit Week 1 Reflection
+        </button>
+    </div>
+
+    <!-- Result Container -->
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <!-- Week Information -->
+    <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-top: 30px;">
+        <h4 style="margin: 0 0 10px 0;">ℹ️ About This Week</h4>
+        <p style="margin: 0 0 10px 0; line-height: 1.6;">
+            Welcome to your AI learning journey! This week's reflection is an opportunity to capture your 
+            initial thoughts and expectations about artificial intelligence. There's no right or wrong answer - 
+            we want to understand your perspective as you begin this course.
+        </p>
+        <p style="margin: 0; font-size: 0.9em; color: #666;">
+            <strong>Requirements:</strong> Minimum 100 words | Be genuine and thoughtful | Share your honest perspective
+        </p>
+    </div>
+</div>
+
+<!-- Include BadgeQuest Library -->
+<script src="badgequest_lib.js"></script>
+<script>
+// Initialize form with week-specific configuration
+BadgeQuest.init(1, 'Week01', '', 'General Reflection');
+
+// Optional: Add week-specific enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Show a welcome message for first-time users
+    const isFirstVisit = !localStorage.getItem('badgequest_visited');
+    if (isFirstVisit) {
+        BadgeQuest.showNotification('Welcome to BadgeQuest! Your reflections will be auto-saved as you type.', 'info', 5000);
+        localStorage.setItem('badgequest_visited', 'true');
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 3 Reflection - Ethics in AI</title>
+</head>
+<body>
+
+<div id="submission-form" style="font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px;">
+    <!-- Week Header -->
+    <div style="background: #f8f9fa; border-left: 4px solid #dc3545; padding: 15px; margin-bottom: 20px;">
+        <h2 style="margin: 0; color: #dc3545;">⚖️ Week 3: Ethics in AI</h2>
+        <p style="margin: 5px 0 0 0; color: #666;">Theme: Ethics & Responsibility</p>
+    </div>
+
+    <!-- Progress Indicator with Badge Alert -->
+    <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+        <strong>Your Progress:</strong> Week 3 of 12 | 🎯 Complete this week to earn your <strong>🥾 Explorer Badge!</strong>
+    </div>
+
+    <!-- Micro-credential Alert -->
+    <div style="background: #ffe5e5; border: 1px solid #ffcccc; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 5px 0; color: #dc3545;">🏅 Micro-Credential Opportunity</h4>
+        <p style="margin: 0; line-height: 1.5;">
+            This reflection contributes to: <strong>⚖️ AI Ethics Explorer</strong><br>
+            <small style="color: #666;">Complete 2 ethics/responsibility theme reflections to earn this credential!</small>
+        </p>
+    </div>
+
+    <!-- Reflection Prompts -->
+    <div style="background: #f0f8ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #004085;">💭 Reflection Prompts (choose one or more):</h4>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>What ethical concerns do you have about AI development?</li>
+            <li>How can we ensure AI systems are fair and unbiased?</li>
+            <li>What responsibilities do AI developers have to society?</li>
+        </ul>
+        <div style="margin-top: 10px; padding: 10px; background: #ffe5e5; border-radius: 5px;">
+            <strong>🤔 Ethical Lens:</strong> Consider multiple perspectives - developers, users, and those affected by AI decisions.
+        </div>
+    </div>
+
+    <!-- Current Week's Case Study -->
+    <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #495057;">📰 This Week's Case Study</h4>
+        <p style="margin: 0; line-height: 1.6;">
+            We examined facial recognition systems and their impact on privacy and civil liberties. 
+            Consider how these technologies balance utility with ethical concerns, and what safeguards 
+            might be necessary.
+        </p>
+    </div>
+
+    <!-- Student ID Input -->
+    <div style="margin-bottom: 15px;">
+        <label for="student_id" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Student ID: <span style="color: red;">*</span>
+        </label>
+        <input 
+            id="student_id" 
+            type="text" 
+            placeholder="Enter your Curtin Student ID"
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px;"
+            required
+        />
+    </div>
+
+    <!-- Hidden Fields -->
+    <input id="course_id" type="hidden" value="AI101" />
+    <input id="week_id" type="hidden" value="Week03" />
+    <input id="theme_id" type="hidden" value="ethics" />
+
+    <!-- Reflection Textarea -->
+    <div style="margin-bottom: 15px;">
+        <label for="reflection" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Your Ethical Reflection: <span style="color: red;">*</span>
+        </label>
+        <textarea 
+            id="reflection" 
+            rows="10" 
+            placeholder="Explore the ethical implications of AI technologies discussed this week..."
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px; resize: vertical;"
+            required
+        ></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="text-align: center; margin: 20px 0;">
+        <button 
+            onclick="BadgeQuest.submitReflection()" 
+            style="background: #dc3545; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold;"
+            onmouseover="this.style.background='#c82333'" 
+            onmouseout="this.style.background='#dc3545'"
+        >
+            ⚖️ Submit Ethics Reflection
+        </button>
+    </div>
+
+    <!-- Result Container -->
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <!-- Ethics Framework -->
+    <div style="background: #fff; border: 2px solid #dc3545; padding: 15px; border-radius: 5px; margin-top: 30px;">
+        <h4 style="margin: 0 0 10px 0; color: #dc3545;">🎯 Ethical Thinking Framework</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+            <div style="padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                <strong>Consider Impact</strong>
+                <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9em;">
+                    <li>Who benefits?</li>
+                    <li>Who might be harmed?</li>
+                    <li>Long-term consequences?</li>
+                </ul>
+            </div>
+            <div style="padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                <strong>Evaluate Fairness</strong>
+                <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9em;">
+                    <li>Is it equitable?</li>
+                    <li>Are there biases?</li>
+                    <li>Transparency level?</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Week Information -->
+    <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-top: 15px;">
+        <h4 style="margin: 0 0 10px 0;">ℹ️ About Ethics & Responsibility Theme</h4>
+        <p style="margin: 0 0 10px 0; line-height: 1.6;">
+            Ethical reflections demonstrate your ability to think critically about AI's societal impact. 
+            Strong submissions consider multiple stakeholders, identify potential harms and benefits, 
+            and propose thoughtful approaches to ethical challenges.
+        </p>
+        <p style="margin: 0; font-size: 0.9em; color: #666;">
+            <strong>Requirements:</strong> Minimum 100 words | Consider multiple perspectives | Think critically about impact
+        </p>
+    </div>
+</div>
+
+<!-- Include BadgeQuest Library -->
+<script src="badgequest_lib.js"></script>
+<script>
+// Initialize form with week-specific configuration
+BadgeQuest.init(3, 'Week03', 'ethics', 'Ethics & Responsibility');
+
+// Week-specific enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Badge achievement reminder
+    const weeksCompleted = [
+        localStorage.getItem('badgequest_submitted_Week01'),
+        localStorage.getItem('badgequest_submitted_Week02')
+    ].filter(Boolean).length;
+    
+    if (weeksCompleted === 2) {
+        BadgeQuest.showNotification('🎯 Complete this week to earn your Explorer Badge!', 'info', 5000);
+    }
+    
+    // Show ethics resources
+    const ethicsResources = document.createElement('details');
+    ethicsResources.style.cssText = 'margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;';
+    ethicsResources.innerHTML = `
+        <summary style="cursor: pointer; font-weight: bold;">📚 Additional Ethics Resources</summary>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>IEEE Ethics Guidelines for AI</li>
+            <li>ACM Code of Ethics</li>
+            <li>AI Now Institute Reports</li>
+            <li>Partnership on AI Principles</li>
+        </ul>
+    `;
+    document.querySelector('#submission-form').appendChild(ethicsResources);
+});
+</script>
+
+</body>
+</html>

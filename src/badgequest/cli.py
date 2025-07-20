@@ -210,6 +210,99 @@ def load_config(config_file: str):
 
 
 @cli.command()
+@click.option("--schedule", "-s", type=click.Path(exists=True), required=True, help="Course schedule JSON file")
+@click.option("--output", "-o", default="weekly_forms", help="Output directory for forms")
+@click.option("--server-url", default="https://YOUR_SERVER_URL", help="BadgeQuest server URL")
+def generate_weekly_forms(schedule: str, output: str, server_url: str):
+    """Generate pre-configured weekly forms from course schedule."""
+    import shutil
+    from pathlib import Path
+
+    # Load schedule
+    try:
+        with open(schedule) as f:
+            course_data = json.load(f)
+    except Exception as e:
+        click.echo(f"❌ Error loading schedule: {e}", err=True)
+        sys.exit(1)
+
+    # Create output directory
+    output_path = Path(output)
+    output_path.mkdir(exist_ok=True)
+
+    # Get template directory
+    template_dir = Path(__file__).parent.parent.parent / "templates" / "lms" / "weekly"
+
+    # Copy shared files
+    shared_files = ["badgequest_lib.js", "course_schedule.json", "catch_up_form.html",
+                   "progress_dashboard.html", "instructor_guide.md"]
+
+    for file in shared_files:
+        src = template_dir / file
+        if src.exists():
+            dst = output_path / file
+            shutil.copy2(src, dst)
+
+            # Update server URL in files
+            if file.endswith((".js", ".html")):
+                with open(dst) as f:
+                    content = f.read()
+                content = content.replace("https://YOUR_SERVER_URL", server_url)
+                with open(dst, "w") as f:
+                    f.write(content)
+
+    # Generate week-specific forms
+    week_template = template_dir / "week_01_introduction.html"
+    if week_template.exists():
+        with open(week_template) as f:
+            template_content = f.read()
+    else:
+        click.echo("⚠️  Week template not found, using basic template", err=True)
+        template_content = "<html><body>Week {{week}} Form</body></html>"
+
+    # Generate forms for each week
+    generated = 0
+    for week_data in course_data.get("schedule", []):
+        week_num = week_data["week"]
+        week_id = week_data["week_id"]
+        title = week_data["title"]
+        theme_id = week_data.get("theme_id", "")
+        theme_name = week_data.get("theme_name", "General Reflection")
+
+        # Determine filename
+        if theme_id:
+            filename = f"week_{str(week_num).zfill(2)}_{theme_id}.html"
+        else:
+            filename = f"week_{str(week_num).zfill(2)}_general.html"
+
+        # Customize content
+        form_content = template_content
+        form_content = form_content.replace("Week 1:", f"Week {week_num}:")
+        form_content = form_content.replace("Introduction to AI", title)
+        form_content = form_content.replace('value="Week01"', f'value="{week_id}"')
+        form_content = form_content.replace('BadgeQuest.init(1,', f'BadgeQuest.init({week_num},')
+        form_content = form_content.replace("'Week01',", f"'{week_id}',")
+        form_content = form_content.replace("General Reflection", theme_name)
+        form_content = form_content.replace('value=""', f'value="{theme_id}"')
+        form_content = form_content.replace(server_url, server_url)
+
+        # Write form
+        with open(output_path / filename, "w") as f:
+            f.write(form_content)
+        generated += 1
+
+    click.echo(f"✅ Generated {generated} weekly forms in: {output_path}")
+    click.echo("📁 Files created:")
+    for file in sorted(output_path.iterdir()):
+        click.echo(f"   - {file.name}")
+    click.echo("\n💡 Next steps:")
+    click.echo("   1. Review and customize the forms")
+    click.echo("   2. Update server URL in badgequest_lib.js")
+    click.echo("   3. Upload to your LMS")
+    click.echo("   4. See instructor_guide.md for deployment tips")
+
+
+@cli.command()
 def example_config():
     """Generate an example course configuration file."""
     example = {

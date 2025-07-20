@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch-Up Reflections - BadgeQuest</title>
+</head>
+<body>
+
+<div id="submission-form" style="font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px;">
+    <!-- Header -->
+    <div style="background: #f8f9fa; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px;">
+        <h2 style="margin: 0; color: #856404;">📝 Catch-Up Reflections</h2>
+        <p style="margin: 5px 0 0 0; color: #666;">Submit missed weekly reflections</p>
+    </div>
+
+    <!-- Instructions -->
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ Important Notes</h4>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>Use this form ONLY for missed weeks (not for resubmissions)</li>
+            <li>Select the correct week and theme for your reflection</li>
+            <li>Reflections should relate to the content covered in that specific week</li>
+            <li>Late submissions receive full credit - badges are based on completion, not timing</li>
+        </ul>
+    </div>
+
+    <!-- Progress Overview -->
+    <div id="progress-overview" style="background: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0;">📊 Your Current Progress</h4>
+        <div id="progress-content">
+            <p style="color: #666;">Enter your Student ID to see which weeks you've completed...</p>
+        </div>
+    </div>
+
+    <!-- Student ID Input -->
+    <div style="margin-bottom: 15px;">
+        <label for="student_id" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Student ID: <span style="color: red;">*</span>
+        </label>
+        <input 
+            id="student_id" 
+            type="text" 
+            placeholder="Enter your Curtin Student ID"
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px;"
+            onblur="checkProgress()"
+            required
+        />
+    </div>
+
+    <!-- Week Selection -->
+    <div style="margin-bottom: 15px;">
+        <label for="week_select" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Select Week: <span style="color: red;">*</span>
+        </label>
+        <select 
+            id="week_select" 
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px;"
+            onchange="updateThemeAndPrompts()"
+            required
+        >
+            <option value="">-- Select a week --</option>
+        </select>
+    </div>
+
+    <!-- Theme Display -->
+    <div id="theme_display" style="display: none; margin-bottom: 15px; padding: 10px; background: #f0f8ff; border-radius: 5px;">
+        <strong>Theme:</strong> <span id="theme_name"></span>
+    </div>
+
+    <!-- Prompts Display -->
+    <div id="prompts_display" style="display: none; margin-bottom: 20px;">
+        <div style="background: #f0f8ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 5px;">
+            <h4 style="margin: 0 0 10px 0; color: #004085;">💭 Reflection Prompts:</h4>
+            <ul id="prompts_list" style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            </ul>
+        </div>
+    </div>
+
+    <!-- Hidden Fields -->
+    <input id="course_id" type="hidden" value="AI101" />
+    <input id="week_id" type="hidden" value="" />
+    <input id="theme_id" type="hidden" value="" />
+
+    <!-- Reflection Textarea -->
+    <div style="margin-bottom: 15px;">
+        <label for="reflection" style="display: block; font-weight: bold; margin-bottom: 5px;">
+            Your Reflection: <span style="color: red;">*</span>
+        </label>
+        <textarea 
+            id="reflection" 
+            rows="10" 
+            placeholder="First select a week above, then write your reflection based on that week's content..."
+            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 16px; resize: vertical;"
+            required
+        ></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="text-align: center; margin: 20px 0;">
+        <button 
+            onclick="submitCatchUp()" 
+            style="background: #ffc107; color: #212529; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold;"
+            onmouseover="this.style.background='#e0a800'" 
+            onmouseout="this.style.background='#ffc107'"
+        >
+            📤 Submit Catch-Up Reflection
+        </button>
+    </div>
+
+    <!-- Result Container -->
+    <div id="result" style="margin-top: 20px;"></div>
+</div>
+
+<!-- Include BadgeQuest Library -->
+<script src="badgequest_lib.js"></script>
+<script>
+// Load course schedule
+let courseSchedule = {};
+
+// Load schedule from JSON
+fetch('course_schedule.json')
+    .then(response => response.json())
+    .then(data => {
+        courseSchedule = data;
+        populateWeekSelect();
+    })
+    .catch(err => {
+        console.error('Failed to load course schedule:', err);
+        // Fallback data
+        courseSchedule = {
+            schedule: [
+                { week: 1, week_id: "Week01", title: "Introduction", theme_id: "", theme_name: "General" },
+                { week: 2, week_id: "Week02", title: "ML Basics", theme_id: "technical", theme_name: "Technical" },
+                { week: 3, week_id: "Week03", title: "Ethics", theme_id: "ethics", theme_name: "Ethics" }
+            ]
+        };
+        populateWeekSelect();
+    });
+
+// Populate week selection dropdown
+function populateWeekSelect() {
+    const select = document.getElementById('week_select');
+    courseSchedule.schedule.forEach(week => {
+        const option = document.createElement('option');
+        option.value = week.week_id;
+        option.textContent = `Week ${week.week}: ${week.title}`;
+        option.dataset.themeId = week.theme_id;
+        option.dataset.themeName = week.theme_name;
+        option.dataset.weekNum = week.week;
+        select.appendChild(option);
+    });
+}
+
+// Update theme and prompts when week is selected
+function updateThemeAndPrompts() {
+    const select = document.getElementById('week_select');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (!selectedOption.value) {
+        document.getElementById('theme_display').style.display = 'none';
+        document.getElementById('prompts_display').style.display = 'none';
+        return;
+    }
+    
+    // Update hidden fields
+    document.getElementById('week_id').value = selectedOption.value;
+    document.getElementById('theme_id').value = selectedOption.dataset.themeId || '';
+    
+    // Show theme
+    document.getElementById('theme_display').style.display = 'block';
+    document.getElementById('theme_name').textContent = selectedOption.dataset.themeName;
+    
+    // Show prompts if available
+    const weekData = courseSchedule.schedule.find(w => w.week_id === selectedOption.value);
+    if (weekData && weekData.prompts && weekData.prompts.length > 0) {
+        document.getElementById('prompts_display').style.display = 'block';
+        const promptsList = document.getElementById('prompts_list');
+        promptsList.innerHTML = '';
+        weekData.prompts.forEach(prompt => {
+            const li = document.createElement('li');
+            li.textContent = prompt;
+            promptsList.appendChild(li);
+        });
+    }
+    
+    // Update BadgeQuest config
+    BadgeQuest.weekId = selectedOption.value;
+    BadgeQuest.themeId = selectedOption.dataset.themeId || '';
+    BadgeQuest.themeName = selectedOption.dataset.themeName;
+    BadgeQuest.weekNumber = selectedOption.dataset.weekNum;
+}
+
+// Check student progress
+function checkProgress() {
+    const studentId = document.getElementById('student_id').value.trim();
+    if (!studentId) return;
+    
+    // Show loading state
+    document.getElementById('progress-content').innerHTML = '<p style="color: #007bff;">Loading your progress...</p>';
+    
+    // Fetch progress from server
+    fetch(`${BadgeQuest.config.serverUrl}/progress/${studentId}?course=AI101&format=json`)
+        .then(response => response.json())
+        .then(data => {
+            const completedWeeks = data.weeks || [];
+            const totalWeeks = 12;
+            const percentage = (completedWeeks.length / totalWeeks * 100).toFixed(0);
+            
+            let html = `
+                <div style="margin-bottom: 10px;">
+                    <strong>Weeks Completed:</strong> ${completedWeeks.length} of ${totalWeeks} (${percentage}%)
+                    <div style="background: #e9ecef; border-radius: 10px; height: 20px; overflow: hidden; margin-top: 5px;">
+                        <div style="background: #28a745; width: ${percentage}%; height: 100%;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>Current Badge:</strong> ${data.current_badge}
+                </div>
+            `;
+            
+            if (completedWeeks.length > 0) {
+                html += '<div><strong>Completed:</strong> ' + completedWeeks.join(', ') + '</div>';
+            }
+            
+            // Highlight missing weeks in dropdown
+            const select = document.getElementById('week_select');
+            Array.from(select.options).forEach(option => {
+                if (option.value && completedWeeks.includes(option.value)) {
+                    option.textContent += ' ✓';
+                    option.style.color = '#28a745';
+                }
+            });
+            
+            document.getElementById('progress-content').innerHTML = html;
+        })
+        .catch(err => {
+            document.getElementById('progress-content').innerHTML = '<p style="color: #666;">Unable to load progress. Continue with submission.</p>';
+        });
+}
+
+// Custom submit function for catch-up form
+function submitCatchUp() {
+    const studentId = document.getElementById('student_id').value.trim();
+    const weekId = document.getElementById('week_id').value;
+    const themeId = document.getElementById('theme_id').value;
+    const text = document.getElementById('reflection').value.trim();
+    
+    if (!studentId) {
+        BadgeQuest.showError('Please enter your Student ID');
+        return;
+    }
+    
+    if (!weekId) {
+        BadgeQuest.showError('Please select a week');
+        return;
+    }
+    
+    if (!text) {
+        BadgeQuest.showError('Please enter your reflection');
+        return;
+    }
+    
+    // Use BadgeQuest library for submission
+    BadgeQuest.submitReflection();
+}
+
+// Initialize with catch-up specific settings
+BadgeQuest.config.serverUrl = 'https://YOUR_SERVER_URL'; // Update this
+BadgeQuest.init(0, '', '', 'Catch-Up');
+
+// Override the already-submitted check for catch-up form
+BadgeQuest.checkPreviousSubmission = function() {
+    // Don't show warning in catch-up form
+};
+</script>
+
+</body>
+</html>

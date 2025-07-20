@@ -1,0 +1,175 @@
+{
+  "course_id": "AI101",
+  "course_name": "Introduction to AI",
+  "start_date": "2024-02-26",
+  "schedule": [
+    {
+      "week": 1,
+      "week_id": "Week01",
+      "title": "Introduction to AI",
+      "theme_id": "",
+      "theme_name": "General Reflection",
+      "description": "Reflect on your initial thoughts about AI and what you hope to learn",
+      "prompts": [
+        "What are your current perceptions of AI?",
+        "What aspects of AI are you most curious about?",
+        "How do you think AI might impact your future career?"
+      ],
+      "micro_credentials": []
+    },
+    {
+      "week": 2,
+      "week_id": "Week02",
+      "title": "Machine Learning Basics",
+      "theme_id": "technical",
+      "theme_name": "Technical Analysis",
+      "description": "Explore the technical foundations of machine learning",
+      "prompts": [
+        "How would you explain machine learning to a non-technical friend?",
+        "What surprised you about how machines 'learn'?",
+        "Which ML algorithm concept was most challenging to understand?"
+      ],
+      "micro_credentials": ["technical_analyst"]
+    },
+    {
+      "week": 3,
+      "week_id": "Week03",
+      "title": "Ethics in AI",
+      "theme_id": "ethics",
+      "theme_name": "Ethics & Responsibility",
+      "description": "Consider the ethical implications of AI systems",
+      "prompts": [
+        "What ethical concerns do you have about AI development?",
+        "How can we ensure AI systems are fair and unbiased?",
+        "What responsibilities do AI developers have to society?"
+      ],
+      "micro_credentials": ["ethics_explorer"]
+    },
+    {
+      "week": 4,
+      "week_id": "Week04",
+      "title": "AI in Healthcare",
+      "theme_id": "innovation",
+      "theme_name": "Innovation & Creativity",
+      "description": "Explore innovative applications of AI in healthcare",
+      "prompts": [
+        "What innovative AI applications in healthcare excite you most?",
+        "How might AI transform patient care in the next decade?",
+        "What creative solutions could AI provide for global health challenges?"
+      ],
+      "micro_credentials": ["innovation_champion"]
+    },
+    {
+      "week": 5,
+      "week_id": "Week05",
+      "title": "Natural Language Processing",
+      "theme_id": "technical",
+      "theme_name": "Technical Analysis",
+      "description": "Dive into how machines understand human language",
+      "prompts": [
+        "What technical challenges exist in teaching machines to understand context?",
+        "How do transformers and attention mechanisms work conceptually?",
+        "What are the limitations of current NLP technologies?"
+      ],
+      "micro_credentials": ["technical_analyst"]
+    },
+    {
+      "week": 6,
+      "week_id": "Week06",
+      "title": "AI and Society",
+      "theme_id": "responsibility",
+      "theme_name": "Ethics & Responsibility",
+      "description": "Examine AI's broader impact on society",
+      "prompts": [
+        "How is AI changing the nature of work and employment?",
+        "What responsibilities do we have in shaping AI's role in society?",
+        "How can we ensure equitable access to AI benefits?"
+      ],
+      "micro_credentials": ["ethics_explorer"]
+    },
+    {
+      "week": 7,
+      "week_id": "Week07",
+      "title": "Computer Vision",
+      "theme_id": "innovation",
+      "theme_name": "Innovation & Creativity",
+      "description": "Explore creative applications of computer vision",
+      "prompts": [
+        "What innovative uses of computer vision have you encountered?",
+        "How could computer vision be creatively applied in your field of interest?",
+        "What new possibilities does visual AI open up?"
+      ],
+      "micro_credentials": ["innovation_champion"]
+    },
+    {
+      "week": 8,
+      "week_id": "Week08",
+      "title": "AI Safety and Alignment",
+      "theme_id": "ethics",
+      "theme_name": "Ethics & Responsibility",
+      "description": "Consider how to build safe and aligned AI systems",
+      "prompts": [
+        "What does 'AI alignment' mean to you?",
+        "How can we ensure AI systems remain beneficial as they become more powerful?",
+        "What safety measures should be mandatory for AI development?"
+      ],
+      "micro_credentials": ["ethics_explorer"]
+    },
+    {
+      "week": 9,
+      "week_id": "Week09",
+      "title": "Collaborative AI",
+      "theme_id": "collaboration",
+      "theme_name": "Collaboration & Teamwork",
+      "description": "Explore human-AI collaboration",
+      "prompts": [
+        "How can humans and AI systems best work together?",
+        "What makes for effective human-AI teams?",
+        "How should we design AI to enhance rather than replace human capabilities?"
+      ],
+      "micro_credentials": []
+    },
+    {
+      "week": 10,
+      "week_id": "Week10",
+      "title": "AI in Education",
+      "theme_id": "critical_thinking",
+      "theme_name": "Critical Thinking",
+      "description": "Critically analyze AI's role in education",
+      "prompts": [
+        "What are the benefits and risks of AI in education?",
+        "How might AI change the way we learn and teach?",
+        "What critical questions should we ask about educational AI?"
+      ],
+      "micro_credentials": []
+    },
+    {
+      "week": 11,
+      "week_id": "Week11",
+      "title": "Future of AI",
+      "theme_id": "innovation",
+      "theme_name": "Innovation & Creativity",
+      "description": "Envision the future possibilities of AI",
+      "prompts": [
+        "What breakthrough AI applications do you envision in the next 20 years?",
+        "How might AI reshape entire industries?",
+        "What creative solutions could AI provide for climate change?"
+      ],
+      "micro_credentials": ["innovation_champion"]
+    },
+    {
+      "week": 12,
+      "week_id": "Week12",
+      "title": "Personal AI Journey",
+      "theme_id": "",
+      "theme_name": "General Reflection",
+      "description": "Reflect on your learning journey and future with AI",
+      "prompts": [
+        "How have your views on AI changed throughout this course?",
+        "What was your most significant learning moment?",
+        "How will you apply what you've learned about AI?"
+      ],
+      "micro_credentials": []
+    }
+  ]
+}

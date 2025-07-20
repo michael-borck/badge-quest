@@ -9,6 +9,25 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Load courses from file if specified
+def _load_courses_from_env():
+    """Load course configurations from environment variable if set."""
+    courses_file = os.environ.get("BADGEQUEST_COURSES_FILE")
+    if courses_file and Path(courses_file).exists():
+        try:
+            with open(courses_file) as f:
+                import json
+                return json.load(f)
+        except Exception as e:
+            print(f"Warning: Failed to load courses from {courses_file}: {e}")
+    return None
+
+# Load external courses if available
+_external_courses = _load_courses_from_env()
+if _external_courses and "default" not in _external_courses:
+    # Always ensure default course exists
+    _external_courses["default"] = None  # Will be set to DEFAULT_COURSE later
+
 
 class BadgeLevel:
     """Represents a badge level configuration."""
@@ -79,7 +98,7 @@ class Config:
 
     # Application configuration
     APP_NAME = "BadgeQuest"
-    APP_VERSION = "0.3.0"
+    APP_VERSION = "0.3.1"
 
     # Database configuration
     @property
@@ -109,7 +128,8 @@ class Config:
     }
 
     # Course configurations (can be loaded from file or environment)
-    COURSES: dict[str, dict[str, Any]] = {
+    # Start with default courses
+    _DEFAULT_COURSES = {
         "default": DEFAULT_COURSE,
         "AI101": {
             "name": "Introduction to AI",
@@ -152,6 +172,14 @@ class Config:
             },
         },
     }
+
+    # Merge external courses with defaults
+    COURSES: dict[str, dict[str, Any]] = _DEFAULT_COURSES.copy()
+    if _external_courses:
+        COURSES.update(_external_courses)
+        # Ensure default course always exists
+        if "default" not in COURSES:
+            COURSES["default"] = DEFAULT_COURSE
 
     @classmethod
     def get_course_config(cls, course_id: str | None = None) -> CourseConfig:

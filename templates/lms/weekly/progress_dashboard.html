@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My BadgeQuest Progress</title>
+    <style>
+        .badge-card {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+        .badge-card.earned {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .badge-card.current {
+            border-color: #ffc107;
+            background: #fff3cd;
+            transform: scale(1.05);
+        }
+        .badge-card.locked {
+            opacity: 0.5;
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .week-item {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .week-item.completed {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .week-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .credential-card {
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .credential-card.earned {
+            background: #f0e5ff;
+            border-color: #6f42c1;
+        }
+        .credential-icon {
+            font-size: 2em;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div style="font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px;">
+    <!-- Header -->
+    <div style="background: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin-bottom: 30px; border-radius: 0 8px 8px 0;">
+        <h1 style="margin: 0; color: #007bff;">🏆 My BadgeQuest Progress</h1>
+        <p style="margin: 10px 0 0 0; color: #666;">Track your reflection journey and achievements</p>
+    </div>
+
+    <!-- Student ID Input -->
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+        <label for="student_id" style="display: block; font-weight: bold; margin-bottom: 10px; font-size: 1.1em;">
+            Enter Your Student ID:
+        </label>
+        <div style="display: flex; gap: 10px;">
+            <input 
+                id="student_id" 
+                type="text" 
+                placeholder="Your Curtin Student ID"
+                style="flex: 1; padding: 12px; border: 2px solid #ced4da; border-radius: 5px; font-size: 16px;"
+            />
+            <button 
+                onclick="loadProgress()" 
+                style="background: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold;"
+            >
+                📊 View Progress
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" style="display: none; text-align: center; padding: 40px;">
+        <div style="font-size: 2em; color: #007bff;">⏳</div>
+        <p>Loading your progress...</p>
+    </div>
+
+    <!-- Progress Content -->
+    <div id="progress-content" style="display: none;">
+        <!-- Overall Progress -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+            <h2 style="margin: 0 0 20px 0;">📈 Overall Progress</h2>
+            <div id="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; font-weight: bold; color: #007bff;" id="weeks-count">0</div>
+                    <div style="color: #666;">Weeks Completed</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; font-weight: bold; color: #28a745;" id="current-badge">-</div>
+                    <div style="color: #666;">Current Badge</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; font-weight: bold; color: #6f42c1;" id="micro-count">0</div>
+                    <div style="color: #666;">Micro-Credentials</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-bar" style="width: 0%;">
+                    0%
+                </div>
+            </div>
+            <p id="next-badge-info" style="text-align: center; color: #666; margin: 10px 0;"></p>
+        </div>
+
+        <!-- Badge Progression -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+            <h2 style="margin: 0 0 20px 0;">🏅 Badge Progression</h2>
+            <div id="badges-container" style="text-align: center;">
+                <!-- Badges will be populated here -->
+            </div>
+        </div>
+
+        <!-- Weekly Submissions -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+            <h2 style="margin: 0 0 20px 0;">📅 Weekly Submissions</h2>
+            <div class="week-grid" id="weeks-grid">
+                <!-- Weeks will be populated here -->
+            </div>
+        </div>
+
+        <!-- Micro-Credentials -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px;">
+            <h2 style="margin: 0 0 20px 0;">🌟 Micro-Credentials</h2>
+            <div id="credentials-container">
+                <!-- Credentials will be populated here -->
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button 
+                onclick="window.print()" 
+                style="background: #6c757d; color: white; border: none; padding: 10px 20px; margin: 0 10px; border-radius: 5px; cursor: pointer;"
+            >
+                🖨️ Print Report
+            </button>
+            <button 
+                onclick="downloadProgress()" 
+                style="background: #28a745; color: white; border: none; padding: 10px 20px; margin: 0 10px; border-radius: 5px; cursor: pointer;"
+            >
+                💾 Download Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" style="display: none; text-align: center; padding: 40px;">
+        <div style="font-size: 3em; color: #dc3545;">😕</div>
+        <h3>Unable to Load Progress</h3>
+        <p id="error-message">Please check your Student ID and try again.</p>
+    </div>
+</div>
+
+<script>
+// Configuration
+const SERVER_URL = 'https://YOUR_SERVER_URL'; // Update this
+const TOTAL_WEEKS = 12;
+const BADGES = [
+    { weeks: 1, emoji: '🧪', title: 'AI Dabbler' },
+    { weeks: 3, emoji: '🥾', title: 'AI Explorer' },
+    { weeks: 5, emoji: '🧠', title: 'AI Thinker' },
+    { weeks: 7, emoji: '🛡️', title: 'AI Warrior' },
+    { weeks: 10, emoji: '🛠️', title: 'AI Builder' },
+    { weeks: 12, emoji: '🗣️', title: 'AI Explainer' },
+    { weeks: 14, emoji: '🏆', title: 'AI Mastery' }
+];
+
+let studentData = null;
+
+function loadProgress() {
+    const studentId = document.getElementById('student_id').value.trim();
+    if (!studentId) {
+        alert('Please enter your Student ID');
+        return;
+    }
+    
+    // Show loading state
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('progress-content').style.display = 'none';
+    document.getElementById('error-state').style.display = 'none';
+    
+    // Fetch progress data
+    fetch(`${SERVER_URL}/progress/${studentId}?course=AI101&format=json`)
+        .then(response => {
+            if (!response.ok) throw new Error('Student not found');
+            return response.json();
+        })
+        .then(data => {
+            studentData = data;
+            displayProgress(data);
+        })
+        .catch(err => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error-state').style.display = 'block';
+            document.getElementById('error-message').textContent = err.message || 'Please check your Student ID and try again.';
+        });
+    
+    // Also fetch micro-credentials
+    fetch(`${SERVER_URL}/api/micro-credentials/${studentId}?course=AI101`)
+        .then(response => response.json())
+        .then(data => {
+            if (studentData) {
+                studentData.microCredentials = data;
+                displayMicroCredentials(data);
+            }
+        })
+        .catch(err => console.error('Failed to load micro-credentials:', err));
+}
+
+function displayProgress(data) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('progress-content').style.display = 'block';
+    
+    // Update statistics
+    const weeksCompleted = data.weeks_completed || 0;
+    const percentage = (weeksCompleted / TOTAL_WEEKS * 100).toFixed(0);
+    
+    document.getElementById('weeks-count').textContent = weeksCompleted;
+    document.getElementById('current-badge').innerHTML = data.current_badge || '—';
+    document.getElementById('progress-bar').style.width = percentage + '%';
+    document.getElementById('progress-bar').textContent = percentage + '%';
+    
+    // Next badge info
+    if (data.next_badge) {
+        document.getElementById('next-badge-info').innerHTML = 
+            `Next: ${data.next_badge} in ${data.weeks_needed} more week${data.weeks_needed > 1 ? 's' : ''}`;
+    }
+    
+    // Display badges
+    displayBadges(weeksCompleted);
+    
+    // Display weeks
+    displayWeeks(data.weeks || []);
+}
+
+function displayBadges(weeksCompleted) {
+    const container = document.getElementById('badges-container');
+    container.innerHTML = '';
+    
+    BADGES.forEach(badge => {
+        const div = document.createElement('div');
+        div.className = 'badge-card';
+        
+        if (weeksCompleted >= badge.weeks) {
+            div.classList.add('earned');
+        } else if (BADGES.findIndex(b => b.weeks > weeksCompleted) === BADGES.indexOf(badge)) {
+            div.classList.add('current');
+        } else {
+            div.classList.add('locked');
+        }
+        
+        div.innerHTML = `
+            <div style="font-size: 3em;">${badge.emoji}</div>
+            <div style="font-weight: bold; margin-top: 10px;">${badge.title}</div>
+            <div style="font-size: 0.9em; color: #666;">Week ${badge.weeks}+</div>
+        `;
+        
+        container.appendChild(div);
+    });
+}
+
+function displayWeeks(completedWeeks) {
+    const container = document.getElementById('weeks-grid');
+    container.innerHTML = '';
+    
+    for (let i = 1; i <= TOTAL_WEEKS; i++) {
+        const weekId = `Week${String(i).padStart(2, '0')}`;
+        const div = document.createElement('div');
+        div.className = 'week-item';
+        
+        if (completedWeeks.includes(weekId)) {
+            div.classList.add('completed');
+            div.innerHTML = `
+                <div style="font-weight: bold;">Week ${i}</div>
+                <div style="font-size: 2em; color: #28a745;">✓</div>
+            `;
+        } else {
+            div.innerHTML = `
+                <div style="font-weight: bold;">Week ${i}</div>
+                <div style="font-size: 2em; color: #dee2e6;">○</div>
+            `;
+        }
+        
+        container.appendChild(div);
+    }
+}
+
+function displayMicroCredentials(data) {
+    const container = document.getElementById('credentials-container');
+    container.innerHTML = '';
+    
+    // Update count
+    document.getElementById('micro-count').textContent = data.total_earned || 0;
+    
+    // Display earned credentials
+    if (data.earned_credentials && data.earned_credentials.length > 0) {
+        const earnedHeader = document.createElement('h4');
+        earnedHeader.textContent = 'Earned Credentials';
+        earnedHeader.style.marginBottom = '15px';
+        container.appendChild(earnedHeader);
+        
+        data.earned_credentials.forEach(cred => {
+            const div = document.createElement('div');
+            div.className = 'credential-card earned';
+            div.innerHTML = `
+                <div class="credential-icon">${cred.emoji}</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; font-size: 1.1em;">${cred.name}</div>
+                    <div style="color: #666; margin: 5px 0;">${cred.description}</div>
+                    <div style="font-size: 0.9em; color: #6f42c1;">
+                        Earned on ${new Date(cred.earned_date).toLocaleDateString()}
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+    
+    // Display in-progress credentials
+    if (data.in_progress_credentials && data.in_progress_credentials.length > 0) {
+        const progressHeader = document.createElement('h4');
+        progressHeader.textContent = 'In Progress';
+        progressHeader.style.margin = '25px 0 15px 0';
+        container.appendChild(progressHeader);
+        
+        data.in_progress_credentials.forEach(cred => {
+            const div = document.createElement('div');
+            div.className = 'credential-card';
+            div.innerHTML = `
+                <div class="credential-icon" style="opacity: 0.5;">${cred.emoji}</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; font-size: 1.1em;">${cred.name}</div>
+                    <div style="color: #666; margin: 5px 0;">${cred.description}</div>
+                    <div style="margin-top: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="flex: 1; background: #e9ecef; border-radius: 5px; height: 10px; overflow: hidden;">
+                                <div style="background: #6f42c1; width: ${(parseInt(cred.progress.split('/')[0]) / parseInt(cred.progress.split('/')[1]) * 100)}%; height: 100%;"></div>
+                            </div>
+                            <span style="font-size: 0.9em; color: #666;">${cred.progress}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+    
+    if (!data.earned_credentials?.length && !data.in_progress_credentials?.length) {
+        container.innerHTML = '<p style="text-align: center; color: #666;">No micro-credentials yet. Submit themed reflections to earn them!</p>';
+    }
+}
+
+function downloadProgress() {
+    if (!studentData) return;
+    
+    const report = `BadgeQuest Progress Report
+Generated: ${new Date().toLocaleString()}
+Student ID: ${studentData.student_id}
+Course: AI101
+
+Overall Progress:
+- Weeks Completed: ${studentData.weeks_completed || 0} / ${TOTAL_WEEKS}
+- Current Badge: ${studentData.current_badge || 'None'}
+- Progress: ${((studentData.weeks_completed || 0) / TOTAL_WEEKS * 100).toFixed(0)}%
+
+Completed Weeks:
+${(studentData.weeks || []).join(', ') || 'None'}
+
+Micro-Credentials:
+${studentData.microCredentials?.earned_credentials?.map(c => `- ${c.emoji} ${c.name}: ${c.description}`).join('\n') || 'None earned yet'}
+`;
+    
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `badgequest_progress_${studentData.student_id}_${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+}
+
+// Auto-load if student ID is in URL parameter
+const urlParams = new URLSearchParams(window.location.search);
+const studentIdParam = urlParams.get('student_id');
+if (studentIdParam) {
+    document.getElementById('student_id').value = studentIdParam;
+    loadProgress();
+}
+</script>
+
+</body>
+</html>
