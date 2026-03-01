@@ -1,5 +1,9 @@
 # BadgeQuest 🏆
 
+<!-- BADGES:START -->
+[![edtech](https://img.shields.io/badge/-edtech-4caf50?style=flat-square)](https://github.com/topics/edtech) [![badges](https://img.shields.io/badge/-badges-blue?style=flat-square)](https://github.com/topics/badges) [![education](https://img.shields.io/badge/-education-blue?style=flat-square)](https://github.com/topics/education) [![flask](https://img.shields.io/badge/-flask-000000?style=flat-square)](https://github.com/topics/flask) [![gamification](https://img.shields.io/badge/-gamification-blue?style=flat-square)](https://github.com/topics/gamification) [![learning-analytics](https://img.shields.io/badge/-learning--analytics-blue?style=flat-square)](https://github.com/topics/learning-analytics) [![lms](https://img.shields.io/badge/-lms-blue?style=flat-square)](https://github.com/topics/lms) [![python](https://img.shields.io/badge/-python-3776ab?style=flat-square)](https://github.com/topics/python) [![reflection](https://img.shields.io/badge/-reflection-blue?style=flat-square)](https://github.com/topics/reflection) [![web-app](https://img.shields.io/badge/-web--app-blue?style=flat-square)](https://github.com/topics/web-app)
+<!-- BADGES:END -->
+
 > Collect, learn, repeat.
 
 BadgeQuest is a gamified reflection system designed for Learning Management Systems (LMS). It transforms student reflections into meaningful achievements through an engaging badge progression system.
